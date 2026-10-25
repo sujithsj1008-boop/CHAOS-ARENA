@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+work/
+.env
+.env.*
+!.env.example
+
+# Local Netlify folder
+.netlify

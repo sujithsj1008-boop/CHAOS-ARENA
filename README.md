@@ -1,38 +1,47 @@
-# CHAOS-ARENA
-CHAOS ARENA is an exciting, browser-based multiplayer party game. Designed to deliver an engaging gaming experience, it combines four unique mini-game stages into one competitive arena where players compete for the highest score and the title of champion. Create a room. Invite your friends. Embrace the chaos. Claim the crown!
-# 🎮 CHAOS ARENA – The Ultimate Multiplayer Party Game
+# CHAOS ARENA — Netlify upload project
 
-CHAOS ARENA is an exciting, browser-based multiplayer party game that brings friends together through creativity, reflexes, intelligence, and friendly competition. Designed to deliver an engaging gaming experience, it combines four unique mini-game stages into one competitive arena where players battle for the highest score and the title of champion.
+**12 Players. 1 Arena. Absolutely No Peace.**
 
-## 🚀 Key Features
+This is an upload-ready copy of CHAOS ARENA. It keeps the existing React game and all four stages, replaces the always-on Socket.IO server with a Netlify Function, and stores shared rooms in Netlify Blobs.
 
-- **Multiplayer Gaming:** Create private rooms and invite friends using a unique room code.
-- **Up to 12 Players:** Compete with friends in a shared gaming environment.
-- **Browser-Based Access:** Play on supported computers, tablets, and smartphones without installing a separate application.
-- **Live Leaderboard:** Track player scores and rankings throughout the competition.
-- **Modern Interface:** Experience a vibrant design featuring midnight purple, electric cyan, and hot orange, enhanced with animations and playful avatars.
-- **Synchronized Gameplay:** Designed to maintain consistent game progress, player actions, and scores across connected devices.
+## Deploy in a browser
 
-## 🕹️ Four Exciting Game Stages
+1. Sign in to a Netlify account. A Netlify account is required for a lasting site and for the site's Functions and Blobs.
+2. Download and extract `netlify-ready-game.zip` so the folder contains `netlify.toml`, `package.json`, and `pnpm-lock.yaml` at its top level.
+3. In the logged-in Netlify dashboard, create a project using the browser upload flow and upload the extracted project folder. Keep the project root selected; do not upload `src` or `dist` by itself.
+4. Netlify reads `netlify.toml`, installs the locked dependencies, builds the frontend, and deploys `netlify/functions/game.ts` as `/.netlify/functions/game`.
+5. Open the resulting site URL in two separate browser windows to play together.
 
-**1. Draw & Guess 🎨**  
-Players take turns drawing secret words while others race against the clock to guess correctly. This stage tests creativity, observation, and quick thinking.
+Netlify's basic Drop flow expects an extracted folder rather than a ZIP. Netlify documents that logged-in uploads can build a source project; anonymous Drop publishes files as-is and cannot build this Functions project. The upload workflow may present a project-creation or visibility step. If the team defaults new projects to private, change visibility to public before sharing the URL.
 
-**2. Reflex Rumble ⚡**  
-Players participate in fast-paced reaction challenges that test their reflexes, concentration, and response accuracy.
+Netlify Blobs is provisioned by Netlify when the deployed Function uses it. This project needs no user-supplied API key, no separately created database, and no manually entered environment variables. Netlify supplies its own site access context to the Function.
 
-**3. Brain Glitch 🧠**  
-This stage challenges players with puzzles, pattern recognition, and brain-teasing questions that reward logical reasoning and quick decisions.
+## Local development
 
-**4. Chaos Finale 🏆**  
-The final showdown brings the competition to its peak. Players compete to maximize their scores and secure the overall victory.
+Requires Node.js 22.12 or newer and pnpm 11.25. The Netlify Vite plugin emulates the Function and Blobs locally.
 
-## 🛠️ Technology and Innovation
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
 
-CHAOS ARENA focuses on responsive web design, multiplayer communication, shared game-state management, and reliable scoring. Its planned deployment architecture can use modern frontend technologies such as React and TypeScript, combined with Netlify Functions and Netlify Blobs for serverless game-state management.
+Open the Vite address shown in the terminal. The local Blobs emulator is separate from the production site's data.
 
-## 🎯 Project Objective
+## Verification commands
 
-The primary objective of CHAOS ARENA is to make multiplayer gaming accessible, interactive, and entertaining. By combining different skills within a single game, it encourages teamwork, creativity, strategic thinking, and friendly rivalry while providing an enjoyable experience across devices.
+```sh
+pnpm exec tsc --noEmit
+pnpm build
+pnpm test
+```
 
-**Create a room. Invite your friends. Embrace the chaos. Claim the crown!** 👑
+The game Function uses one strongly consistent Blob per room. Updates use the documented `onlyIfNew` and `onlyIfMatch` conditions and retry on stale ETags. The Function revalidates identity and game rules on every request. The browser polls every 1.5 seconds; drawing packets are batched before sending.
+
+## Known limitations
+
+- Netlify Functions use request/response calls, so lobby updates are polling-based rather than instant WebSocket pushes.
+- A match advances when a player polls or acts. If everyone disconnects, transitions resume when a player reconnects.
+- Rooms are durable Blobs and currently have no automatic cleanup job. Active matches and disconnected seats survive deploys, but old room records remain until manually removed from Netlify Blobs.
+- The application targets a single room record per action and uses conditional writes for conflict detection. It has not been load-tested against a live Netlify Blobs service.
+- Function request volume grows with active player count because of polling and drawing uploads. Review Netlify usage if a large group plays for long sessions.
+- This package has not been deployed from a Netlify account in this environment. No public URL is being claimed.

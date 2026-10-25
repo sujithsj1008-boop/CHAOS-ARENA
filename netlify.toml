@@ -1,0 +1,10 @@
+[build]
+  command = "pnpm install --frozen-lockfile && pnpm build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "24.22.1"
