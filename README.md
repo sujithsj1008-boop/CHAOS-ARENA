@@ -1,5 +1,6 @@
 # CHAOS ARENA — Netlify upload project
-
+play here!!!!!!!!
+https://sprightly-chaja-59be2f.netlify.app/
 **12 Players. 1 Arena. Absolutely No Peace.**
 
 This is an upload-ready copy of CHAOS ARENA. It keeps the existing React game and all four stages, replaces the always-on Socket.IO server with a Netlify Function, and stores shared rooms in Netlify Blobs.
